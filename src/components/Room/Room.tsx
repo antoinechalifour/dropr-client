@@ -1,8 +1,15 @@
 import * as React from 'react';
+import DebugPannel from './DebugPannel';
 
 interface Log {
   timestamp: Date;
   message: string;
+}
+
+export interface Peer {
+  id: string;
+  pc: RTCPeerConnection;
+  dataChannel?: RTCDataChannel;
 }
 
 interface RoomProps {
@@ -11,6 +18,7 @@ interface RoomProps {
 
 interface RoomState {
   logs: Log[];
+  peers: Map<string, Peer>;
 }
 
 interface OnJoinEvent {
@@ -33,9 +41,10 @@ interface OnIceCandidateEvent {
 }
 
 export default class Room extends React.Component<RoomProps, RoomState> {
-  state: RoomState = { logs: [] };
-
-  private connections = new Map<string, RTCPeerConnection>();
+  state: RoomState = {
+    logs: [],
+    peers: new Map<string, Peer>()
+  };
 
   componentDidMount() {
     this.log('Joining room...');
@@ -56,6 +65,9 @@ export default class Room extends React.Component<RoomProps, RoomState> {
             <li key={Math.random()}><strong>{log.timestamp.toISOString()}</strong> - {log.message}</li>
           ))}
         </ul>
+        <DebugPannel
+          peers={Array.from(this.state.peers.values())}
+        />
       </div>
     );
   }
@@ -87,6 +99,17 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     this.log(`=> ${event.id} - Creating data channel`);
     const channel = pc.createDataChannel('label');
 
+    const peer = {
+      id: event.id,
+      pc,
+      dataChannel: channel
+    };
+
+    const peers = new Map(this.state.peers);
+    peers.set(peer.id, peer);
+
+    this.setState({ peers });
+
     this.configureChannel(channel);
 
     pc.onicecandidate = e => {
@@ -101,8 +124,6 @@ export default class Room extends React.Component<RoomProps, RoomState> {
         candidate: e.candidate
       });
     };
-
-    this.connections.set(event.id, pc);
 
     // Create an RTC offer to send to the newly added client
     this.log(`=> ${event.id} - Creating offer.`);
@@ -146,12 +167,29 @@ export default class Room extends React.Component<RoomProps, RoomState> {
       });
     };
 
-    this.connections.set(event.id, pc);
+    const peer = {
+      id: event.id,
+      pc
+    };
+    const peers = new Map(this.state.peers);
+    peers.set(peer.id, peer);
+
+    this.setState({ peers });
 
     // As this client is not the initiator of the connections,
     // it needs to add an datachannel listener.
     pc.ondatachannel = e => {
+      const partialPeer = this.state.peers.get(event.id);
+
+      if (!partialPeer) {
+        return;
+      }
+
+      partialPeer.dataChannel = e.channel;
+      const nextPeers = new Map(this.state.peers);
+
       this.log(`=> ${event.id} - Added a data channel.`);
+      this.setState({ peers: nextPeers });
       this.configureChannel(e.channel);
     };
 
@@ -177,31 +215,31 @@ export default class Room extends React.Component<RoomProps, RoomState> {
 
   private onRoomAnswer = (event: OnAnswerEvent) => {
     this.log(`=> ${event.id} - Sent an answer.`);
-    const pc = this.connections.get(event.id);
+    const peer = this.state.peers.get(event.id);
 
-    if (!pc) {
+    if (!peer) {
       return;
     }
 
     this.log(`=> ${event.id} - Setting the remote description`);
-    pc.setRemoteDescription(event.offer);
+    peer.pc.setRemoteDescription(event.offer);
   }
 
   private onRoomIceCandidate = (event: OnIceCandidateEvent) => {
     this.log(`=> ${event.id} - Sent an ice candidate`);
-    const pc = this.connections.get(event.id);
+    const peer = this.state.peers.get(event.id);
 
-    if (!pc) {
+    if (!peer) {
       return;
     }
 
     this.log(`=> ${event.id} - Adding ice candidate.`);
-    pc.addIceCandidate(event.candidate);
+    peer.pc.addIceCandidate(event.candidate);
   }
 
   private configureChannel = (channel: RTCDataChannel) => {
     this.log('Configuring data channel');
-    console.log(channel);
+
     channel.onopen = () => console.log('Channel is now open');
     channel.onclose = () => console.log('Channel is now closed');
     channel.onmessage = e => console.log(e.data);
