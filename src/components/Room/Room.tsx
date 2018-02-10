@@ -22,6 +22,23 @@ interface FileAddedEvent extends RoomEvent {
   payload: FileAddedEventPayload;
 }
 
+interface FileDownloadEventPayload {
+  name: string;
+}
+
+interface FileDownloadEvent extends RoomEvent {
+  payload: FileDownloadEventPayload;
+}
+
+interface FileDownloadSetUpEventPayload {
+  size: number;
+  name: string;
+}
+
+interface FileDownloadSetupEvent extends RoomEvent {
+  payload: FileDownloadSetUpEventPayload;
+}
+
 interface OnJoinEvent {
   id: string;
 }
@@ -62,7 +79,10 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     return (
       <div>
         <h1>Room</h1>
-        <DownloadableFiles files={this.state.downloadableFiles} />
+        <DownloadableFiles
+          files={this.state.downloadableFiles}
+          onDownload={this.onDownload}
+        />
         <FileInput onFile={this.onFile} />
         <DebugPannel
           peers={Array.from(this.state.peers.values())}
@@ -234,9 +254,36 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   private configureChannel = (channel: RTCDataChannel) => {
     this.log('Configuring data channel');
 
+    let downloadName = '';
+    let downloadSize = 0;
+    let receivedBytes = 0;
+    let downloadBuffer: ArrayBuffer[] = [];
+
+    const completeDownload = () => {
+      const blob = new window.Blob(downloadBuffer);
+      const anchor = document.createElement('a');
+      anchor.href = URL.createObjectURL(blob);
+      anchor.download = downloadName;
+
+      anchor.click();
+      downloadBuffer = [];
+      downloadName = '';
+      downloadSize = 0;
+      receivedBytes = 0;
+    };
+
     channel.onopen = () => console.log('Channel is now open');
     channel.onclose = () => this.onChannelClose(channel);
     channel.onmessage = (message: MessageEvent) => {
+      if (message.data && message.data.byteLength) {
+        receivedBytes += message.data.byteLength;
+        downloadBuffer.push(message.data);
+
+        if (receivedBytes >= downloadSize) {
+          completeDownload();
+        }
+        return;
+      }
       const event = JSON.parse(message.data) as RoomEvent;
 
       switch (event.type) {
@@ -248,6 +295,56 @@ export default class Room extends React.Component<RoomProps, RoomState> {
           });
           break;
         }
+
+        case 'file/download/setup': {
+          const downloadEvent = event as FileDownloadSetupEvent;
+
+          downloadSize = downloadEvent.payload.size;
+          downloadName = downloadEvent.payload.name;
+          break;
+        }
+
+        case 'file/download': {
+          const downloadEvent = event as FileDownloadEvent;
+
+          const file = this.state.ownedFiles.find(x => x.name === downloadEvent.payload.name);
+
+          if (!file) {
+            return;
+          }
+
+          const BYTES_PER_CHUNK = 1200;
+          const reader = new FileReader();
+          let currentChunk = 0;
+
+          const readNextChunk = () => {
+            const start = BYTES_PER_CHUNK * currentChunk;
+            const end = Math.min(file.size, start + BYTES_PER_CHUNK);
+            reader.readAsArrayBuffer(file.slice(start, end));
+          };
+
+          reader.onload = () => {
+            channel.send(reader.result);
+            currentChunk += 1;
+
+            if (BYTES_PER_CHUNK * currentChunk < file.size) {
+              readNextChunk();
+            }
+          };
+
+          const downloadSetupEvent = {
+            type: 'file/download/setup',
+            payload: {
+              size: file.size,
+              name: file.name
+            }
+          };
+
+          channel.send(JSON.stringify(downloadSetupEvent));
+          readNextChunk();
+          break;
+        }
+
         default: {
           console.log('Unknown event type');
         }
@@ -300,5 +397,16 @@ export default class Room extends React.Component<RoomProps, RoomState> {
 
       peer.dataChannel.send(JSON.stringify(event));
     });
+  }
+
+  private onDownload = (file: DownloadableFile) => {
+    const event = {
+      type: 'file/download',
+      payload: {
+        name: file.name
+      }
+    };
+
+    file.channel.send(JSON.stringify(event));
   }
 }

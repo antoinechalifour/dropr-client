@@ -4,13 +4,14 @@ import { DownloadableFile } from '.';
 
 interface DownloadableFilesProps {
   files: DownloadableFile[];
+  onDownload: (file: DownloadableFile) => void;
 }
 
 const File = styled.li`
   cursor: pointer;
 `;
 
-export default function DownloadableFiles({ files }: DownloadableFilesProps) {
+export default function DownloadableFiles({ files, onDownload }: DownloadableFilesProps) {
   return (
     <ul>
       {files.map(file => (
@@ -24,7 +25,7 @@ export default function DownloadableFiles({ files }: DownloadableFilesProps) {
               <li>Date: {file.lastModifiedDate}</li>
             </ul>
 
-            <button>Download</button>
+            <button onClick={() => onDownload(file)}>Download</button>
           </header>
         </File>
       ))}
