@@ -22,6 +22,7 @@
     "@types/react-dom": "^16.0.3",
     "@types/socket.io-client": "^1.4.32",
     "@types/webrtc": "0.0.22",
+    "reset.css": "^2.0.2",
     "typescript": "^2.7.1"
   }
 }
