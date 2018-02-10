@@ -235,7 +235,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     this.log('Configuring data channel');
 
     channel.onopen = () => console.log('Channel is now open');
-    channel.onclose = () => console.log('Channel is now closed');
+    channel.onclose = () => this.onChannelClose(channel);
     channel.onmessage = (message: MessageEvent) => {
       const event = JSON.parse(message.data) as RoomEvent;
 
@@ -253,6 +253,26 @@ export default class Room extends React.Component<RoomProps, RoomState> {
         }
       }
     };
+  }
+
+  private onChannelClose = (channel: RTCDataChannel) => {
+    // When a user disconnects, we need to remove him from the peers
+    // and removes it files.
+    // Filter next peers
+    const peersToRemove = Array.from(this.state.peers.values())
+      .filter(peer => peer.dataChannel === channel);
+    const nextPeers = new Map(this.state.peers);
+
+    peersToRemove.forEach(peer => nextPeers.delete(peer.id));
+
+    // Filter next files
+    const nextDownloadableFiles = this.state.downloadableFiles
+      .filter(file => file.channel !== channel);
+
+    this.setState({
+      peers: nextPeers,
+      downloadableFiles: nextDownloadableFiles
+    });
   }
 
   private onFile = (file: File) => {
