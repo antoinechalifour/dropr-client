@@ -1,11 +1,12 @@
 import * as React from 'react';
+import DebugPannel from './DebugPannel';
 
 interface Log {
   timestamp: Date;
   message: string;
 }
 
-interface Peer {
+export interface Peer {
   id: string;
   pc: RTCPeerConnection;
   dataChannel?: RTCDataChannel;
@@ -64,6 +65,9 @@ export default class Room extends React.Component<RoomProps, RoomState> {
             <li key={Math.random()}><strong>{log.timestamp.toISOString()}</strong> - {log.message}</li>
           ))}
         </ul>
+        <DebugPannel
+          peers={Array.from(this.state.peers.values())}
+        />
       </div>
     );
   }
