@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Peer } from '.';
+import { Peer, FileAddedEventPayload, DownloadableFile } from '.';
 import DebugPannel from './DebugPannel';
 import FileInput from './FileInput';
+import DownloadableFiles from './DownloadableFiles';
 
 interface RoomProps {
   socket: SocketIOClient.Socket;
@@ -15,17 +16,6 @@ interface RoomState {
 
 interface RoomEvent {
   type: string;
-}
-
-interface FileAddedEventPayload {
-  name: string;
-  type: string;
-  size: number;
-  lastModifiedDate: string;
-}
-
-interface DownloadableFile extends FileAddedEventPayload {
-  channel: RTCDataChannel;
 }
 
 interface FileAddedEvent extends RoomEvent {
@@ -72,6 +62,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     return (
       <div>
         <h1>Room</h1>
+        <DownloadableFiles files={this.state.downloadableFiles} />
         <FileInput onFile={this.onFile} />
         <DebugPannel
           peers={Array.from(this.state.peers.values())}
