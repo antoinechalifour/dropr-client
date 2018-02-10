@@ -1,23 +1,13 @@
 import * as React from 'react';
+import { Peer } from '.';
 import DebugPannel from './DebugPannel';
-
-interface Log {
-  timestamp: Date;
-  message: string;
-}
-
-export interface Peer {
-  id: string;
-  pc: RTCPeerConnection;
-  dataChannel?: RTCDataChannel;
-}
+import FileInput from './FileInput';
 
 interface RoomProps {
   socket: SocketIOClient.Socket;
 }
 
 interface RoomState {
-  logs: Log[];
   peers: Map<string, Peer>;
 }
 
@@ -42,7 +32,6 @@ interface OnIceCandidateEvent {
 
 export default class Room extends React.Component<RoomProps, RoomState> {
   state: RoomState = {
-    logs: [],
     peers: new Map<string, Peer>()
   };
 
@@ -60,11 +49,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     return (
       <div>
         <h1>Room</h1>
-        <ul>
-          {this.state.logs.map(log => (
-            <li key={Math.random()}><strong>{log.timestamp.toISOString()}</strong> - {log.message}</li>
-          ))}
-        </ul>
+        <FileInput onFile={this.onFile} />
         <DebugPannel
           peers={Array.from(this.state.peers.values())}
         />
@@ -73,12 +58,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
   }
 
   private log(message: string) {
-    this.setState({
-      logs: [...this.state.logs, {
-        timestamp: new Date(),
-        message
-      }]
-    });
+    console.log(message);
   }
 
   private onRoomJoin = async (event: OnJoinEvent) => {

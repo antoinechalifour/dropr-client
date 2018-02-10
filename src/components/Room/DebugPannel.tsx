@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { Peer } from './Room';
+import { Peer } from '.';
 
 export interface DebugPanelProps {
   peers: Peer[];
