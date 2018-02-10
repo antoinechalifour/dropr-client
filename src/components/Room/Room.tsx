@@ -9,6 +9,27 @@ interface RoomProps {
 
 interface RoomState {
   peers: Map<string, Peer>;
+  ownedFiles: File[];
+  downloadableFiles: DownloadableFile[];
+}
+
+interface RoomEvent {
+  type: string;
+}
+
+interface FileAddedEventPayload {
+  name: string;
+  type: string;
+  size: number;
+  lastModifiedDate: string;
+}
+
+interface DownloadableFile extends FileAddedEventPayload {
+  channel: RTCDataChannel;
+}
+
+interface FileAddedEvent extends RoomEvent {
+  payload: FileAddedEventPayload;
 }
 
 interface OnJoinEvent {
@@ -32,7 +53,9 @@ interface OnIceCandidateEvent {
 
 export default class Room extends React.Component<RoomProps, RoomState> {
   state: RoomState = {
-    peers: new Map<string, Peer>()
+    peers: new Map<string, Peer>(),
+    ownedFiles: [],
+    downloadableFiles: []
   };
 
   componentDidMount() {
@@ -222,10 +245,49 @@ export default class Room extends React.Component<RoomProps, RoomState> {
 
     channel.onopen = () => console.log('Channel is now open');
     channel.onclose = () => console.log('Channel is now closed');
-    channel.onmessage = e => console.log(e.data);
+    channel.onmessage = (message: MessageEvent) => {
+      const event = JSON.parse(message.data) as RoomEvent;
+
+      switch (event.type) {
+        case 'file/new': {
+          const fileEvent = event as FileAddedEvent;
+
+          this.setState({
+            downloadableFiles: [...this.state.downloadableFiles, { ...fileEvent.payload, channel }]
+          });
+          break;
+        }
+        default: {
+          console.log('Unknown event type');
+        }
+      }
+    };
   }
 
   private onFile = (file: File) => {
-    console.log(file);
+    console.log('File added', file);
+
+    this.setState({
+      ownedFiles: [...this.state.ownedFiles, file]
+    });
+
+    const peers = Array.from(this.state.peers.values());
+    const event = {
+      type: 'file/new',
+      payload: {
+        lastModifiedDate: file.lastModifiedDate,
+        size: file.size,
+        name: file.name,
+        type: file.type
+      }
+    };
+
+    peers.forEach(peer => {
+      if (!peer.dataChannel) {
+        return;
+      }
+
+      peer.dataChannel.send(JSON.stringify(event));
+    });
   }
 }
