@@ -224,4 +224,8 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     channel.onclose = () => console.log('Channel is now closed');
     channel.onmessage = e => console.log(e.data);
   }
+
+  private onFile = (file: File) => {
+    console.log(file);
+  }
 }
