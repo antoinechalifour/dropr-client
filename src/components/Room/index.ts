@@ -4,14 +4,14 @@ export interface Peer {
   dataChannel?: RTCDataChannel;
 }
 
-export interface FileAddedEventPayload {
+export interface SharedFile extends File {
+}
+
+export interface DownloadableFile {
   name: string;
   type: string;
   size: number;
   lastModifiedDate: string;
-}
-
-export interface DownloadableFile extends FileAddedEventPayload {
   channel: RTCDataChannel;
 }
 

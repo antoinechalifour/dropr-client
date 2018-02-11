@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-scripts-ts": "2.13.0",
@@ -18,6 +19,7 @@
   "devDependencies": {
     "@types/jest": "^22.1.2",
     "@types/node": "^4.0.36",
+    "@types/prop-types": "^15.5.2",
     "@types/react": "^16.0.36",
     "@types/react-dom": "^16.0.3",
     "@types/socket.io-client": "^1.4.32",

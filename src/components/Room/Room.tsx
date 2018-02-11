@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Peer, FileAddedEventPayload, DownloadableFile } from '.';
+import { Peer, SharedFile, DownloadableFile } from '.';
 import DebugPannel from './DebugPannel';
 import FileInput from './FileInput';
 import DownloadableFiles from './DownloadableFiles';
@@ -10,7 +10,7 @@ interface RoomProps {
 
 interface RoomState {
   peers: Map<string, Peer>;
-  ownedFiles: File[];
+  ownedFiles: SharedFile[];
   downloadableFiles: DownloadableFile[];
 }
 
@@ -19,7 +19,7 @@ interface RoomEvent {
 }
 
 interface FileAddedEvent extends RoomEvent {
-  payload: FileAddedEventPayload;
+  payload: SharedFile;
 }
 
 interface FileDownloadEventPayload {
@@ -284,7 +284,13 @@ export default class Room extends React.Component<RoomProps, RoomState> {
           const fileEvent = event as FileAddedEvent;
 
           this.setState({
-            downloadableFiles: [...this.state.downloadableFiles, { ...fileEvent.payload, channel }]
+            downloadableFiles: [...this.state.downloadableFiles, {
+              channel,
+              lastModifiedDate: fileEvent.payload.lastModifiedDate.toString(),
+              name: fileEvent.payload.name,
+              size: fileEvent.payload.size,
+              type: fileEvent.payload.type
+            }]
           });
           break;
         }
