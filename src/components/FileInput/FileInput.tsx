@@ -56,6 +56,7 @@ const File = styled.li`
 export interface FileInputProps {
   files: SharedFile[];
   onFile: (file: File) => void;
+  onRemoveFile: (file: SharedFile) => void;
 }
 
 interface FileInputState {
@@ -84,7 +85,7 @@ export class FileInput extends React.Component<FileInputProps, FileInputState> {
               {this.props.files.map(file => (
                 <File key={file.name}>
                   <span>{file.name}</span>
-                  <button>
+                  <button onClick={() => this.props.onRemoveFile(file)}>
                     <MdClear />
                   </button>
                 </File>
@@ -123,7 +124,8 @@ export class FileInput extends React.Component<FileInputProps, FileInputState> {
 
 const mapStateToProps = (state: StateContainer): FileInputProps => ({
   files: state.getState().ownedFiles,
-  onFile: (file: File) => files.addFile(state, file)
+  onFile: (file: File) => files.addFile(state, file),
+  onRemoveFile: (file: SharedFile) => files.removeFile(state, file)
 });
 
 export const FileInputContainer = connect<FileInputProps, {}>(mapStateToProps)(FileInput);

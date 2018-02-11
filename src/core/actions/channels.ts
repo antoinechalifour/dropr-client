@@ -1,4 +1,4 @@
-import { StateContainer } from '../State';
+import { StateContainer, SharedFile } from '../State';
 import { DownloadableFile } from '../State';
 
 interface DataChannelEvent {
@@ -13,8 +13,16 @@ interface FileDownloadPayload {
   name: string;
 }
 
+interface FileRemovedPayload {
+  name: string;
+}
+
 interface FileDownloadEvent extends DataChannelEvent {
   payload: FileDownloadPayload;
+}
+
+interface FileRemovedEvent extends DataChannelEvent {
+  payload: FileRemovedPayload;
 }
 
 function isBinaryData(e: MessageEvent) {
@@ -58,6 +66,9 @@ export default {
     }, {
       type: 'file/download',
       callback: this.onFileDownload(state, channel)
+    }, {
+      type: 'file/remove',
+      callback: this.onFileRemoved(state, channel)
     }]);
   },
 
@@ -95,7 +106,6 @@ export default {
       const { ownedFiles } = state.getState();
 
       ownedFiles.forEach(file => {
-        console.log('Emitting channel file new');
         channel.send(JSON.stringify({
           type: 'file/new',
           payload: {
@@ -163,12 +173,20 @@ export default {
     readNextChunk();
   },
 
+  onFileRemoved: (state: StateContainer, channel: RTCDataChannel) => (e: DataChannelEvent) => {
+    const event = e as FileRemovedEvent;
+    const { downloadableFiles } = state.getState();
+
+    state.setState({
+      downloadableFiles: downloadableFiles.filter(x => x.name !== event.payload.name)
+    });
+  },
+
   notifyFileAvailable(state: StateContainer, file: File) {
     const { peers } = state.getState();
 
     peers.forEach(peer => {
       if (peer.dataChannel && peer.dataChannel.readyState === 'open') {
-        console.log('Sending data...');
         peer.dataChannel.send(JSON.stringify({
           type: 'file/new',
           payload: {
@@ -176,6 +194,21 @@ export default {
             size: file.size,
             type: file.type,
             lastModifiedDate: file.lastModifiedDate.toString()
+          }
+        }));
+      }
+    });
+  },
+
+  notifyFileRemoved(state: StateContainer, file: SharedFile) {
+    const { peers } = state.getState();
+
+    peers.forEach(peer => {
+      if (peer.dataChannel && peer.dataChannel.readyState === 'open') {
+        peer.dataChannel.send(JSON.stringify({
+          type: 'file/remove',
+          payload: {
+            name: file.name
           }
         }));
       }
