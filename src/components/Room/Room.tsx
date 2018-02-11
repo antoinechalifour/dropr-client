@@ -95,18 +95,20 @@ export default class Room extends React.Component<RoomProps, RoomState> {
     console.log(message);
   }
 
+  private createRtcPeerConnection = () => new RTCPeerConnection({
+    iceServers: [
+      { urls: 'stun:stun01.sipphone.com' },
+      { urls: 'stun:stun.ekiga.net' },
+      { urls: 'stun:stun.fwdnet.net' },
+      { urls: 'stun:stun.ideasip.com' },
+      { urls: 'stun:stun.iptel.org' },
+      { urls: 'stun:stun.rixtelecom.se' },
+    ]
+  })
+
   private onRoomJoin = async (event: OnJoinEvent) => {
     this.log(`=> ${event.id} - Joined the room.`);
-    const pc = new RTCPeerConnection({
-      iceServers: [
-        { urls: 'stun:stun01.sipphone.com' },
-        { urls: 'stun:stun.ekiga.net' },
-        { urls: 'stun:stun.fwdnet.net' },
-        { urls: 'stun:stun.ideasip.com' },
-        { urls: 'stun:stun.iptel.org' },
-        { urls: 'stun:stun.rixtelecom.se' },
-      ]
-    });
+    const pc = this.createRtcPeerConnection();
 
     // As this client is the initiator of the connection,
     // it needs to create the data channel
@@ -157,16 +159,7 @@ export default class Room extends React.Component<RoomProps, RoomState> {
 
   private onRoomOffer = async (event: OnOfferEvent) => {
     this.log(`=> ${event.id} - Sent an offer.`);
-    const pc = new RTCPeerConnection({
-      iceServers: [
-        { urls: 'stun:stun01.sipphone.com' },
-        { urls: 'stun:stun.ekiga.net' },
-        { urls: 'stun:stun.fwdnet.net' },
-        { urls: 'stun:stun.ideasip.com' },
-        { urls: 'stun:stun.iptel.org' },
-        { urls: 'stun:stun.rixtelecom.se' },
-      ]
-    });
+    const pc = this.createRtcPeerConnection();
 
     pc.onicecandidate = e => {
       if (!e.candidate) {
