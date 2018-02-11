@@ -11,8 +11,18 @@ export class StateProvider extends React.Component<StateProviderProps> {
     state: PropTypes.object
   };
 
+  private unsubscribe: () => void;
+
   getChildContext() {
     return { state: this.props.state };
+  }
+
+  componentDidMount() {
+    this.unsubscribe = this.props.state.subscribe(() => this.forceUpdate());
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
   }
 
   render() {

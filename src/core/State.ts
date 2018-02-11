@@ -29,7 +29,7 @@ type Listener = (state: State) => void;
 export class StateContainer {
   private state: State;
 
-  private listeners: Listener[];
+  private listeners: Listener[] = [];
 
   constructor(initialState: State) {
     this.state = initialState;
