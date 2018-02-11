@@ -27,12 +27,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 }
 
-interface InjectedProps {
-  socket: SocketIOClient.Socket;
-}
-
-const mapStateToProps = (state: StateContainer, ownProps: AppProps): InjectedProps => ({
+const mapStateToProps = (state: StateContainer, ownProps: AppProps): AppProps => ({
   socket: state.getState().socket
 });
 
-export default connect<InjectedProps, {}>(mapStateToProps)(App);
+export default connect<AppProps, {}>(mapStateToProps)(App);
