@@ -85,6 +85,8 @@ export default {
       state.setState({
         currentDownload: undefined
       });
+    } else {
+      state.setState({ currentDownload });
     }
   },
 

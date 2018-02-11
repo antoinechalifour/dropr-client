@@ -3,6 +3,7 @@ import { SocketHandlerContainer } from '../SocketHandler';
 import { DebugPanelContainer } from '../DebugPanel';
 import { FileInputContainer } from '../FileInput';
 import { DownloadableFilesContainer } from '../DownloadableFiles';
+import { DownloadProgressContainer } from '../DownloadProgress';
 
 export function Room() {
   return (
@@ -11,6 +12,7 @@ export function Room() {
       <DownloadableFilesContainer />
       <FileInputContainer />
       <DebugPanelContainer />
+      <DownloadProgressContainer />
     </React.Fragment>
   );
 }
