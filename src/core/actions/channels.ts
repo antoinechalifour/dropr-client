@@ -161,11 +161,15 @@ export default {
       reader.readAsArrayBuffer(file.slice(start, end));
     };
 
-    reader.onload = () => {
+    reader.onload = async () => {
       channel.send(reader.result);
       currentChunk += 1;
 
       if (BYTES_PER_CHUNK * currentChunk < file.size) {
+        while (channel.bufferedAmount > BYTES_PER_CHUNK * 2) {
+          await new Promise(resolve => window.setTimeout(resolve, 1));
+        }
+
         readNextChunk();
       }
     };
