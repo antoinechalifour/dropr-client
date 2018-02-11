@@ -37,7 +37,6 @@ interface OnIceCandidateEvent {
 export class SocketHandler extends React.Component<SocketHandlerProps> {
   componentDidMount() {
     this.props.socket.emit('room/join');
-    this.props.socket.emit('room/join');
 
     this.props.socket.on(
       'room/join',
