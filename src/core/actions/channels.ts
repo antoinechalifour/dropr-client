@@ -50,8 +50,8 @@ export default {
       }
     };
 
-    channel.onopen = () => this.onOpenChannel(state, channel);
-    channel.onclose = () => this.onCloseChannel(state, channel);
+    channel.onopen = this.onOpenChannel(state, channel);
+    channel.onclose = this.onCloseChannel(state, channel);
     channel.onmessage = combineListeners([{
       type: 'file/new',
       callback: this.onFileNew(state, channel)
@@ -92,7 +92,20 @@ export default {
 
   onOpenChannel(state: StateContainer, channel: RTCDataChannel) {
     return () => {
-      console.log('Channel is now open');
+      const { ownedFiles } = state.getState();
+
+      ownedFiles.forEach(file => {
+        console.log('Emitting channel file new');
+        channel.send(JSON.stringify({
+          type: 'file/new',
+          payload: {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            lastModifiedDate: file.lastModifiedDate.toString()
+          }
+        }));
+      });
     };
   },
 
