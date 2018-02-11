@@ -1,5 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import { MdImage } from 'react-icons/lib/md';
 import { connect } from '../StateProvider';
 import { DownloadableFile, StateContainer } from '../../core/State';
 import { channels } from '../../core/actions';
@@ -9,29 +10,77 @@ export interface DownloadableFilesProps {
   onDownload: (file: DownloadableFile) => void;
 }
 
+const Files = styled.ul`
+  display: flex;
+  flex-wrap: wrap;
+  padding: 24px;
+  align-items: flex-start;
+`;
+
 const File = styled.li`
+  flex: 25% 0 0;
+  padding: 12px;
+  text-align: center;
   cursor: pointer;
+  box-sizing: border-box;
+`;
+
+const FileName = styled.h3`
+  padding: 8px;
+  background: rgba(255, 255, 255, .2);
+  border-radius: 4px;
+  color: #fff;
+  display: inline-block;
+  word-break: break-word;
+`;
+
+const Empty = styled.div`
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  opacity: .75;
+`;
+
+const IconContainer = styled.div`
+  padding: 24px;
+  background: #fff;
+  text-align: center;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .24);
+
+  svg {
+    font-size: 48px;
+    opacity: .33;
+  }
 `;
 
 export function DownloadableFiles({ files, onDownload }: DownloadableFilesProps) {
+  if (!files.length) {
+    return (
+      <Empty>
+        No files available for download :'(
+      </Empty>
+    );
+  }
+
   return (
-    <ul>
-      {files.map(file => (
-        <File>
-          <header>
-            <h3>{file.name}</h3>
-
-            <ul>
-              <li>Size: {file.size}</li>
-              <li>Type: {file.type}</li>
-              <li>Date: {file.lastModifiedDate}</li>
-            </ul>
-
-            <button onClick={() => onDownload(file)}>Download</button>
-          </header>
-        </File>
-      ))}
-    </ul>
+    <div>
+      <Files>
+        {files.map(file => (
+          <File onClick={() => onDownload(file)}>
+            <header>
+              <IconContainer>
+                <MdImage />
+              </IconContainer>
+              <FileName>{file.name} ({(file.size / 1000000).toFixed(1)}mo)</FileName>
+            </header>
+          </File>
+        ))}
+      </Files>
+    </div>
   );
 }
 

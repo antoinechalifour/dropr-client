@@ -6,6 +6,7 @@
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-icons": "^2.2.7",
     "react-scripts-ts": "2.13.0",
     "socket.io-client": "^2.0.4",
     "styled-components": "^3.1.6"
@@ -22,6 +23,7 @@
     "@types/prop-types": "^15.5.2",
     "@types/react": "^16.0.36",
     "@types/react-dom": "^16.0.3",
+    "@types/react-icons": "^2.2.4",
     "@types/socket.io-client": "^1.4.32",
     "@types/webrtc": "0.0.22",
     "reset.css": "^2.0.2",
