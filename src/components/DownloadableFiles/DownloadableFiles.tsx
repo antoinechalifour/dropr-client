@@ -9,6 +9,7 @@ import {
   MdFolder,
   MdCode
 } from 'react-icons/lib/md';
+import * as filesize from 'filesize';
 import { connect } from '../StateProvider';
 import { DownloadableFile, StateContainer } from '../../core/State';
 import { channels } from '../../core/actions';
@@ -107,7 +108,7 @@ export function DownloadableFiles({ files, onDownload }: DownloadableFilesProps)
                 <IconContainer>
                   {icon}
                 </IconContainer>
-                <FileName>{file.name} ({(file.size / 1000000).toFixed(1)}mo)</FileName>
+                <FileName>{file.name} ({filesize(file.size)})</FileName>
               </header>
             </File>
           );
