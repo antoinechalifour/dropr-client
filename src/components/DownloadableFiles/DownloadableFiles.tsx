@@ -1,6 +1,14 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { MdImage } from 'react-icons/lib/md';
+import {
+  MdImage,
+  MdInsertDriveFile,
+  MdOndemandVideo,
+  MdPictureAsPdf,
+  MdAudiotrack,
+  MdFolder,
+  MdCode
+} from 'react-icons/lib/md';
 import { connect } from '../StateProvider';
 import { DownloadableFile, StateContainer } from '../../core/State';
 import { channels } from '../../core/actions';
@@ -44,7 +52,7 @@ const Empty = styled.div`
 `;
 
 const IconContainer = styled.div`
-  padding: 24px;
+  padding: 48px 24px;
   background: #fff;
   text-align: center;
   border-radius: 4px;
@@ -69,16 +77,41 @@ export function DownloadableFiles({ files, onDownload }: DownloadableFilesProps)
   return (
     <div>
       <Files>
-        {files.map(file => (
-          <File onClick={() => onDownload(file)}>
-            <header>
-              <IconContainer>
-                <MdImage />
-              </IconContainer>
-              <FileName>{file.name} ({(file.size / 1000000).toFixed(1)}mo)</FileName>
-            </header>
-          </File>
-        ))}
+        {files.map(file => {
+          const icon = (function (type: string) {
+            switch (type) {
+              case 'image/jpeg':
+              case 'image/png':
+                return <MdImage />;
+              case 'text/markdown':
+              case 'text/javascript':
+              case 'application/json':
+                return <MdCode />;
+              case 'audio/mp3':
+                return <MdAudiotrack />;
+              case 'video/mp4':
+                return <MdOndemandVideo />;
+              case 'application/pdf':
+                return <MdPictureAsPdf />;
+              case 'application/zip':
+              case 'application/x-gzip':
+                return <MdFolder />;
+              default:
+                return <MdInsertDriveFile />;
+            }
+          })(file.type);
+
+          return (
+            <File key={`${file.lastModifiedDate}-${file.name}`} onClick={() => onDownload(file)}>
+              <header>
+                <IconContainer>
+                  {icon}
+                </IconContainer>
+                <FileName>{file.name} ({(file.size / 1000000).toFixed(1)}mo)</FileName>
+              </header>
+            </File>
+          );
+        })}
       </Files>
     </div>
   );

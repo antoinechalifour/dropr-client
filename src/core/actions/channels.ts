@@ -126,7 +126,7 @@ export default {
       return;
     }
 
-    const BYTES_PER_CHUNK = 1200;
+    const BYTES_PER_CHUNK = 16000;
     const reader = new FileReader();
     let currentChunk = 0;
 
