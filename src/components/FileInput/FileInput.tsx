@@ -12,7 +12,7 @@ interface WrapperProps {
 const Wrapper = styled<WrapperProps, 'div'>('div') `
   box-sizing: border-box;
   background: rgba(255, 255, 255, .9);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .55);
+  box-shadow: 0 -1px 12px rgba(0, 0, 0, .2);
   transition: padding .2s ease;
 
   padding: ${({ hover }) => hover ? 256 : 0}px 0px;
