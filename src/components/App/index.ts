@@ -1,2 +1,1 @@
-export * from './StateProvider';
-export { default } from './App';
+export * from './App';

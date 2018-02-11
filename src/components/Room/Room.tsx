@@ -1,51 +1,16 @@
 import * as React from 'react';
-import {
-  Peer,
-  SharedFile,
-  DownloadableFile,
-  StateContainer,
-} from '../../core/State';
-import { connect } from '../App/StateProvider';
-import SocketHandler from './SocketHandler';
-import DebugPannel from './DebugPannel';
-import FileInput from './FileInput';
-import DownloadableFiles from './DownloadableFiles';
+import { SocketHandlerContainer } from '../SocketHandler';
+import { DebugPanelContainer } from '../DebugPanel';
+import { FileInputContainer } from '../FileInput';
+import { DownloadableFilesContainer } from '../DownloadableFiles';
 
-interface RoomProps {
-  peers: Peer[];
-  ownedFiles: SharedFile[];
-  downloadableFiles: DownloadableFile[];
+export function Room() {
+  return (
+    <React.Fragment>
+      <SocketHandlerContainer />
+      <DownloadableFilesContainer />
+      <FileInputContainer />
+      <DebugPanelContainer />
+    </React.Fragment>
+  );
 }
-
-class Room extends React.Component<RoomProps> {
-  render() {
-    return (
-      <div>
-        <h1>Room</h1>
-        <SocketHandler />
-        <DownloadableFiles />
-        <FileInput />
-        <DebugPannel />
-      </div>
-    );
-  }
-
-  // private onDownload = (file: DownloadableFile) => {
-  // const event = {
-  //   type: 'file/download',
-  //   payload: {
-  //     name: file.name
-  //   }
-  // };
-
-  // file.channel.send(JSON.stringify(event));
-  // }
-}
-
-const mapStateToProps = (state: StateContainer): RoomProps => ({
-  peers: state.getState().peers,
-  ownedFiles: state.getState().ownedFiles,
-  downloadableFiles: state.getState().downloadableFiles
-});
-
-export default connect<RoomProps, {}>(mapStateToProps)(Room);

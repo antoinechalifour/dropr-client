@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { connect } from '../App/StateProvider';
+import { connect } from '../StateProvider';
 import {
   StateContainer,
   Peer
@@ -34,7 +34,7 @@ interface OnIceCandidateEvent {
   candidate: RTCIceCandidate;
 }
 
-class SocketHandler extends React.Component<SocketHandlerProps> {
+export class SocketHandler extends React.Component<SocketHandlerProps> {
   componentDidMount() {
     this.props.socket.emit('room/join');
     this.props.socket.emit('room/join');
@@ -71,4 +71,4 @@ const mapStateToProps = (state: StateContainer): SocketHandlerProps => ({
   addIceCandidate: (id: string, candidate: RTCIceCandidate) => peers.addIceCandidate(state, id, candidate)
 });
 
-export default connect<SocketHandlerProps, {}>(mapStateToProps)(SocketHandler);
+export const SocketHandlerContainer = connect<SocketHandlerProps, {}>(mapStateToProps)(SocketHandler);

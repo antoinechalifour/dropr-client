@@ -1,5 +1,5 @@
 import { StateContainer } from '../State';
-import { DownloadableFile } from '../../components/Room/index';
+import { DownloadableFile } from '../State';
 
 interface DataChannelEvent {
   type: string;

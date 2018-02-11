@@ -3,7 +3,8 @@ import './index.css';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as SocketIo from 'socket.io-client';
-import App, * as app from './components/App';
+import { AppContainer } from './components/App';
+import { StateProvider } from './components/StateProvider';
 import { StateContainer } from './core/State';
 
 const state = new StateContainer({
@@ -17,8 +18,8 @@ const state = new StateContainer({
 console.log(state);
 
 ReactDOM.render(
-  <app.StateProvider state={state}>
-    <App />
-  </app.StateProvider>,
+  <StateProvider state={state}>
+    <AppContainer />
+  </StateProvider>,
   document.getElementById('root') as HTMLElement
 );

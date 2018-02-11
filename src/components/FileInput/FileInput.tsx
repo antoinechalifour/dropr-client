@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { connect } from '../App/StateProvider';
+import { connect } from '../StateProvider';
 import { StateContainer } from '../../core/State';
 import { files } from '../../core/actions';
 
-interface FileInputProps {
+export interface FileInputProps {
   onFile: (file: File) => void;
 }
 
-class FileInput extends React.Component<FileInputProps, {}> {
+export class FileInput extends React.Component<FileInputProps, {}> {
   render() {
     return (
       <div>
@@ -33,4 +33,4 @@ const mapStateToProps = (state: StateContainer): FileInputProps => ({
   onFile: (file: File) => files.addFile(state, file)
 });
 
-export default connect<FileInputProps, {}>(mapStateToProps)(FileInput);
+export const FileInputContainer = connect<FileInputProps, {}>(mapStateToProps)(FileInput);

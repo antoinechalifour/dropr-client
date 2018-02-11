@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { Peer, StateContainer } from '../../core/State';
-import { connect } from '../App/StateProvider';
+import { connect } from '../StateProvider';
 
 export interface DebugPanelProps {
   peers: Peer[];
@@ -52,7 +52,7 @@ const Pre = styled.pre`
   padding: 6px;
 `;
 
-class DebugPanel extends React.Component<DebugPanelProps, DebugPanelState> {
+export class DebugPanel extends React.Component<DebugPanelProps, DebugPanelState> {
   state: DebugPanelState = { show: false };
   componentDidMount() {
     window.addEventListener('keyup', this.onKeyUp);
@@ -118,4 +118,4 @@ const mapStateToProps = (state: StateContainer): DebugPanelProps => ({
   peers: state.getState().peers
 });
 
-export default connect<DebugPanelProps, {}>(mapStateToProps)(DebugPanel);
+export const DebugPanelContainer = connect<DebugPanelProps, {}>(mapStateToProps)(DebugPanel);
