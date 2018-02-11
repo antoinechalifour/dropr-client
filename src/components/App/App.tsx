@@ -20,7 +20,7 @@ class App extends React.Component<AppProps, AppState> {
 
   render() {
     if (this.state.isConnected) {
-      return <Room socket={this.props.socket} />;
+      return <Room />;
     }
 
     return <div>Loading...</div>;

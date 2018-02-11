@@ -10,8 +10,11 @@ const state = new StateContainer({
   peers: [],
   ownedFiles: [],
   downloadableFiles: [],
-  socket: SocketIo(process.env.REACT_APP_API_URI)
+  socket: SocketIo(process.env.REACT_APP_API_URI),
+  currentDownload: undefined
 });
+
+console.log(state);
 
 ReactDOM.render(
   <app.StateProvider state={state}>

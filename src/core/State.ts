@@ -4,15 +4,21 @@ export interface Peer {
   dataChannel?: RTCDataChannel;
 }
 
-export interface SharedFile {
+export interface SharedFile extends File {
+}
+
+export interface DownloadableFile {
   name: string;
   type: string;
   size: number;
   lastModifiedDate: string;
+  channel: RTCDataChannel;
 }
 
-export interface DownloadableFile extends SharedFile {
-  peer: Peer;
+export interface Download {
+  file: DownloadableFile;
+  buffer: ArrayBuffer[];
+  bytes: number;
 }
 
 export interface State {
@@ -20,6 +26,7 @@ export interface State {
   peers: Peer[];
   ownedFiles: SharedFile[];
   downloadableFiles: DownloadableFile[];
+  currentDownload?: Download;
 }
 
 type PartialState = Partial<State>;
@@ -53,8 +60,4 @@ export class StateContainer {
     // Return the unsubscribe function.
     return () => this.listeners = this.listeners.filter(x => x !== listener);
   }
-}
-
-export function setSocket(state: StateContainer, socket: SocketIOClient.Socket) {
-  state.setState({ socket });
 }

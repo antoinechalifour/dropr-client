@@ -1,10 +1,13 @@
 import * as React from 'react';
+import { connect } from '../App/StateProvider';
+import { StateContainer } from '../../core/State';
+import { files } from '../../core/actions';
 
-export interface FileInputProps {
+interface FileInputProps {
   onFile: (file: File) => void;
 }
 
-export default class FileInput extends React.Component<FileInputProps, {}> {
+class FileInput extends React.Component<FileInputProps, {}> {
   render() {
     return (
       <div>
@@ -20,8 +23,14 @@ export default class FileInput extends React.Component<FileInputProps, {}> {
       return;
     }
 
-    const files = Array.from(input.files);
+    const newFiles = Array.from(input.files);
 
-    files.forEach(this.props.onFile);
+    newFiles.forEach(this.props.onFile);
   }
 }
+
+const mapStateToProps = (state: StateContainer): FileInputProps => ({
+  onFile: (file: File) => files.addFile(state, file)
+});
+
+export default connect<FileInputProps, {}>(mapStateToProps)(FileInput);

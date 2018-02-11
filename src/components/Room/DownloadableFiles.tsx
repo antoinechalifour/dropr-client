@@ -1,6 +1,8 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { DownloadableFile } from '.';
+import { connect } from '../App/StateProvider';
+import { DownloadableFile, StateContainer } from '../../core/State';
+import { channels } from '../../core/actions';
 
 interface DownloadableFilesProps {
   files: DownloadableFile[];
@@ -11,7 +13,7 @@ const File = styled.li`
   cursor: pointer;
 `;
 
-export default function DownloadableFiles({ files, onDownload }: DownloadableFilesProps) {
+function DownloadableFiles({ files, onDownload }: DownloadableFilesProps) {
   return (
     <ul>
       {files.map(file => (
@@ -32,3 +34,10 @@ export default function DownloadableFiles({ files, onDownload }: DownloadableFil
     </ul>
   );
 }
+
+const mapStateToProps = (state: StateContainer): DownloadableFilesProps => ({
+  files: state.getState().downloadableFiles,
+  onDownload: (file: DownloadableFile) => channels.downloadFile(state, file)
+});
+
+export default connect<DownloadableFilesProps, {}>(mapStateToProps)(DownloadableFiles);
