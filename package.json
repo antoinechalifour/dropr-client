@@ -15,7 +15,8 @@
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "eject": "react-scripts-ts eject",
+    "commit": "git-cz"
   },
   "devDependencies": {
     "@types/jest": "^22.1.2",
@@ -26,7 +27,13 @@
     "@types/react-icons": "^2.2.4",
     "@types/socket.io-client": "^1.4.32",
     "@types/webrtc": "0.0.22",
+    "cz-conventional-changelog": "^2.1.0",
     "reset.css": "^2.0.2",
     "typescript": "^2.7.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
