@@ -111,9 +111,11 @@ export default {
 
   onCloseChannel(state: StateContainer, channel: RTCDataChannel) {
     return () => {
-      console.log('Closing data channel');
+      const { peers, downloadableFiles } = state.getState();
+
       state.setState({
-        peers: state.getState().peers.filter(x => x.dataChannel !== channel)
+        peers: peers.filter(x => x.dataChannel !== channel),
+        downloadableFiles: downloadableFiles.filter(x => x.channel !== channel)
       });
     };
   },
